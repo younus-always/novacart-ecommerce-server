@@ -1,16 +1,19 @@
+/* eslint-disable no-console */
 import { Server } from "http";
 import mongoose from "mongoose";
 import app from "./app";
+import { envVars } from "./app/config/env";
 
 let server: Server;
 
+
 const startServer = async () => {
       try {
-            await mongoose.connect("mongodb://localhost:27017/novacart_db");
+            await mongoose.connect(envVars.DB_URL);
             console.log("Database connected");
 
-            server = app.listen(4000, () => {
-                  console.log("Server listening on port:4000");
+            server = app.listen(envVars.PORT, () => {
+                  console.log(`Server listening on port:${envVars.PORT}`);
             });
       } catch (error) {
             console.log("Server running failed!", error);
