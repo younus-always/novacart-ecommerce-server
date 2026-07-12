@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import { router } from "./app/routes";
+import { routeNotFound } from "./app/middlewares/notFound";
 
 const app: Application = express();
 
@@ -20,12 +21,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 
-app.use((req: Request, res: Response) => {
-      res.status(404).json({
-            status: false,
-            statusCode: 404,
-            message: "Route Not Found!"
-      });
-});
+app.use(routeNotFound);
 
 export default app;
