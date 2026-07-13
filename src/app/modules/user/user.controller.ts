@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { userService } from "./user.service";
 import httpStatus from "http-status-codes";
+import { catchAsync } from "../../utils/catchAsync";
 
 
-const registerUser = async (req: Request, res: Response) => {
+const registerUser = catchAsync(async (req: Request, res: Response) => {
       const data = await userService.registerUser(req.body);
 
       res.status(httpStatus.CREATED).json({
@@ -12,9 +13,9 @@ const registerUser = async (req: Request, res: Response) => {
             message: "User Registered Successfully",
             data
       });
-};
+});
 
-const getAllUser = async (req: Request, res: Response) => {
+const getAllUser = catchAsync(async (req: Request, res: Response) => {
       const data = await userService.getAllUser();
 
       res.status(httpStatus.OK).json({
@@ -23,9 +24,9 @@ const getAllUser = async (req: Request, res: Response) => {
             message: "All User Retrieved Successfully",
             data
       });
-};
+});
 
-const getUserById = async (req: Request, res: Response) => {
+const getUserById = catchAsync(async (req: Request, res: Response) => {
       const userId = req.params.userId as string;
       const data = await userService.getUserById(userId);
 
@@ -35,9 +36,9 @@ const getUserById = async (req: Request, res: Response) => {
             message: "User Retrieved Successfully",
             data
       });
-};
+});
 
-const updateUser = async (req: Request, res: Response) => {
+const updateUser = catchAsync(async (req: Request, res: Response) => {
       const userId = req.params.userId as string;
       const body = req.body;
       const data = await userService.updateUser(userId, body);
@@ -48,9 +49,9 @@ const updateUser = async (req: Request, res: Response) => {
             message: "User Updated Successfully",
             data
       });
-};
+});
 
-const deleteUser = async (req: Request, res: Response) => {
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
       const userId = req.params.userId as string;
       const data = await userService.deleteUser(userId);
 
@@ -60,7 +61,7 @@ const deleteUser = async (req: Request, res: Response) => {
             message: "User Deleted Successfully",
             data
       });
-};
+});
 
 
 export const userController = {
