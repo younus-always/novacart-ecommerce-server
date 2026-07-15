@@ -2,12 +2,13 @@ import { Request, Response } from "express";
 import { userService } from "./user.service";
 import httpStatus from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
+import { sendResponse } from "../../utils/sendResponse";
 
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
       const data = await userService.registerUser(req.body);
 
-      res.status(httpStatus.CREATED).json({
+      sendResponse(res, {
             success: true,
             statusCode: httpStatus.CREATED,
             message: "User Registered Successfully",
@@ -18,7 +19,7 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
       const data = await userService.getAllUser();
 
-      res.status(httpStatus.OK).json({
+      sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
             message: "All User Retrieved Successfully",
@@ -30,7 +31,7 @@ const getUserById = catchAsync(async (req: Request, res: Response) => {
       const userId = req.params.userId as string;
       const data = await userService.getUserById(userId);
 
-      res.status(httpStatus.OK).json({
+      sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
             message: "User Retrieved Successfully",
@@ -43,7 +44,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
       const body = req.body;
       const data = await userService.updateUser(userId, body);
 
-      res.status(httpStatus.OK).json({
+      sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
             message: "User Updated Successfully",
@@ -55,7 +56,7 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
       const userId = req.params.userId as string;
       const data = await userService.deleteUser(userId);
 
-      res.status(httpStatus.OK).json({
+      sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
             message: "User Deleted Successfully",
