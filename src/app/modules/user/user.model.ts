@@ -4,7 +4,7 @@ import { UserRole } from "./user.constraint";
 
 const authProviderSchema = new Schema<IAuthProvider>({
       provider: { type: String },
-      providerId: { type: String }
+      providerId: { type: String, trim: true, unique: true, lowercase: true }
 }, { _id: false });
 
 const userSchema = new Schema<IUser>({
@@ -15,9 +15,9 @@ const userSchema = new Schema<IUser>({
       },
       email: {
             type: String,
-            lowercase: true,
             unique: true,
             trim: true,
+            lowercase: true,
             required: true,
       },
       password: {
