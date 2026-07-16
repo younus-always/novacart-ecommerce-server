@@ -1,10 +1,30 @@
-import { IUser } from "./user.interface";
+import { envVars } from "../../config/env";
+import { IAuthProvider, IUser } from "./user.interface";
 import { User } from "./user.model";
+import bcrypt from "bcryptjs";
 
 
 const registerUser = async (payload: Partial<IUser>) => {
       const { email, password } = payload;
-      const data = await User.create({ email, password });
+      const isUserExist = await User.findOne({ email });
+
+      if (isUserExist) {
+            throw new Error("User already exists!");
+      };
+
+      const authProvider: IAuthProvider = {
+            provider: "credentials",
+            providerId: email as string,
+      };
+
+      const hashPassword = await bcrypt.hash(password as string, envVars.BCRYPT_SALT);
+
+      const data = await User.create({
+            ...payload,
+            email,
+            password: hashPassword,
+            auths: [authProvider],
+      });
 
       return data;
 };
@@ -20,9 +40,13 @@ const getAllUser = async () => {
 };
 
 const getUserById = async (id: string) => {
-      const data = await User.findById(id);
+      const user = await User.findById(id);
 
-      return data;
+      if (!user) {
+            throw new Error("User not found!");
+      };
+
+      return user;
 };
 
 const updateUser = async (id: string, payload: Partial<IUser>) => {
