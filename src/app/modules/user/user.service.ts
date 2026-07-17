@@ -1,7 +1,9 @@
 import { envVars } from "../../config/env";
+import { AppError } from "../../Error/AppError";
 import { IAuthProvider, IUser } from "./user.interface";
 import { User } from "./user.model";
 import bcrypt from "bcryptjs";
+import httpStatus from 'http-status-codes';
 
 
 const registerUser = async (payload: Partial<IUser>) => {
@@ -9,7 +11,7 @@ const registerUser = async (payload: Partial<IUser>) => {
       const isUserExist = await User.findOne({ email });
 
       if (isUserExist) {
-            throw new Error("User already exists!");
+            throw new AppError(httpStatus.NOT_FOUND, "User already exists!");
       };
 
       const authProvider: IAuthProvider = {
@@ -43,7 +45,7 @@ const getUserById = async (id: string) => {
       const user = await User.findById(id);
 
       if (!user) {
-            throw new Error("User not found!");
+            throw new AppError(httpStatus.NOT_FOUND, "User not found!");
       };
 
       return user;
@@ -53,7 +55,7 @@ const updateUser = async (id: string, payload: Partial<IUser>) => {
       const isUserExist = await User.findById(id);
 
       if (!isUserExist) {
-            throw new Error("User Not Found!")
+            throw new AppError(httpStatus.NOT_FOUND, "User Not Found!")
       };
 
       const user = await User.findByIdAndUpdate(id, payload, { returnDocument: "after" });
@@ -64,7 +66,7 @@ const deleteUser = async (id: string) => {
       const isUserExist = await User.findById(id);
 
       if (!isUserExist) {
-            throw new Error("User Not Found");
+            throw new AppError(httpStatus.NOT_FOUND, "User Not Found");
       };
 
       const user = await User.findByIdAndDelete(id);
