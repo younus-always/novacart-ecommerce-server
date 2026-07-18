@@ -1,4 +1,6 @@
 import z from "zod";
+import { UserRole } from "./user.constraint";
+import { IsActive } from "./user.interface";
 
 export const createUserZodSchema = z.object({
       fullName: z
@@ -32,3 +34,32 @@ export const createUserZodSchema = z.object({
             .optional(),
 });
 
+export const updateUserZodSchema = z.object({
+      name: z
+            .string({ error: "Name is required!" })
+            .min(3, { error: "Name must be at least 3 characters long." })
+            .max(30, { error: "Name cannot exceed 30 characters." })
+            .optional(),
+      phone: z
+            .string({ error: "Phone number must be string." })
+            .regex(/^(?:\+8801\d{9}|01\d{9})$/,
+                  { error: "Phone number must be valid for Bangladesh. Format: +8801XXXXXXXXX or 01XXXXXXXXX" })
+            .optional(),
+      address: z
+            .string({ error: "Address must be string." })
+            .max(200, { error: "Address cannot exceed 200 characters." })
+            .optional(),
+      role: z
+            //  .enum(["SUPER_ADMIN", "ADMIN", "USER", "GUIDE"])
+            .enum(Object.values(UserRole) as [string])
+            .optional(),
+      isActive: z
+            .enum(Object.keys(IsActive) as [string])
+            .optional(),
+      isVerified: z
+            .boolean({ error: "isVerified must be true or false." })
+            .optional(),
+      isDeleted: z
+            .boolean({ error: "isDeleted must be true or false." })
+            .optional()
+});
