@@ -11,10 +11,12 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
       res.cookie("accessToken", data.accessToken, {
             httpOnly: true,
+            sameSite: "lax",
             secure: envVars.NODE_ENV !== "development"
       });
       res.cookie("refreshToken", data.refreshToken, {
             httpOnly: true,
+            sameSite: "lax",
             secure: envVars.NODE_ENV !== "development"
       });
 
@@ -26,7 +28,28 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
       })
 });
 
+const logoutUser = catchAsync(async (req: Request, res: Response) => {
+      res.clearCookie("accessToken", {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: envVars.NODE_ENV !== "development"
+      });
+      res.clearCookie("refreshToken", {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: envVars.NODE_ENV !== "development"
+      });
+
+      sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: "User logout successful",
+            data: null
+      });
+});
+
 
 export const authController = {
       loginUser,
+      logoutUser
 };
