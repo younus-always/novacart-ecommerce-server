@@ -3,23 +3,15 @@ import { catchAsync } from "../../utils/catchAsync";
 import { authService } from "./auth.service";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from 'http-status-codes';
-import { envVars } from "../../config/env";
+import { clearCookie, setAuthCookie } from "../../utils/cookies";
 
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
       const { email, password } = req.body;
       const data = await authService.loginUser(email, password);
 
-      res.cookie("accessToken", data.accessToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: envVars.NODE_ENV !== "development"
-      });
-      res.cookie("refreshToken", data.refreshToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: envVars.NODE_ENV !== "development"
-      });
+      setAuthCookie(res, "accessToken", data.accessToken);
+      setAuthCookie(res, "refreshToken", data.refreshToken);
 
       sendResponse(res, {
             success: true,
@@ -30,16 +22,8 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 });
 
 const logoutUser = catchAsync(async (req: Request, res: Response) => {
-      res.clearCookie("accessToken", {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: envVars.NODE_ENV !== "development"
-      });
-      res.clearCookie("refreshToken", {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: envVars.NODE_ENV !== "development"
-      });
+      clearCookie(res, "accessToken");
+      clearCookie(res, "refreshToken");
 
       sendResponse(res, {
             success: true,
@@ -53,11 +37,7 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
       const { refreshToken } = req.cookies;
       const tokenInfo = await authService.getNewAccessToken(refreshToken);
 
-      res.cookie("accessToken", tokenInfo.accessToken, {
-            httpOnly: true,
-            sameSite: "lax",
-            secure: envVars.NODE_ENV !== "development"
-      });
+      setAuthCookie(res, "accessToken", tokenInfo.accessToken);
 
       sendResponse(res, {
             success: true,
