@@ -2,9 +2,9 @@ import { AppError } from "../../Error/AppError";
 import { User } from "../user/user.model";
 import httpStatus from 'http-status-codes';
 import bcrypt from "bcryptjs";
-import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 import { envVars } from "../../config/env";
 import { IsActive } from "../user/user.interface";
+import { generateToken, verifyToken } from "../../utils/jwt";
 
 
 const loginUser = async (email: string, password: string) => {
@@ -24,8 +24,8 @@ const loginUser = async (email: string, password: string) => {
             role: isUserExist.role
       };
 
-      const accessToken = jwt.sign(payload, envVars.JWT.ACCESS_SECRET_TOKEN, { expiresIn: envVars.JWT.ACCESS_TOKEN_EXPIRES } as SignOptions);
-      const refreshToken = jwt.sign(payload, envVars.JWT.REFRESH_SECRET_TOKEN, { expiresIn: envVars.JWT.REFRESH_TOKEN_EXPIRES } as SignOptions);
+      const accessToken = generateToken(payload, envVars.JWT.ACCESS_SECRET_TOKEN, envVars.JWT.ACCESS_TOKEN_EXPIRES);
+      const refreshToken = generateToken(payload, envVars.JWT.REFRESH_SECRET_TOKEN, envVars.JWT.REFRESH_TOKEN_EXPIRES);
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: userPassword, ...user } = isUserExist.toObject();
@@ -42,7 +42,7 @@ const getNewAccessToken = async (refreshToken: string) => {
             throw new AppError(httpStatus.NOT_FOUND, "user refresh-token missing from cookies!")
       };
 
-      const verifiedRefreshToken = jwt.verify(refreshToken, envVars.JWT.REFRESH_SECRET_TOKEN) as JwtPayload;
+      const verifiedRefreshToken = verifyToken(refreshToken, envVars.JWT.REFRESH_SECRET_TOKEN);
 
       const isUserExist = await User.findOne({ email: verifiedRefreshToken.email });
 
@@ -64,7 +64,7 @@ const getNewAccessToken = async (refreshToken: string) => {
             role: isUserExist.role
       };
 
-      const accessToken = jwt.sign(jwtPayload, envVars.JWT.ACCESS_SECRET_TOKEN, { expiresIn: envVars.JWT.ACCESS_TOKEN_EXPIRES } as SignOptions);
+      const accessToken = generateToken(jwtPayload, envVars.JWT.ACCESS_SECRET_TOKEN, envVars.JWT.ACCESS_TOKEN_EXPIRES);
 
       return {
             accessToken
