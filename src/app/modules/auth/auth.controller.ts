@@ -8,16 +8,18 @@ import { clearCookie, setAuthCookie } from "../../utils/cookies";
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
       const { email, password } = req.body;
-      const data = await authService.loginUser(email, password);
+      const { user, userTokens } = await authService.loginUser(email, password);
 
-      setAuthCookie(res, "accessToken", data.accessToken);
-      setAuthCookie(res, "refreshToken", data.refreshToken);
+      setAuthCookie(res, userTokens);
 
       sendResponse(res, {
             success: true,
             statusCode: httpStatus.OK,
             message: "User logged in successful",
-            data
+            data: {
+                  ...userTokens,
+                  user
+            }
       })
 });
 
@@ -37,7 +39,7 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
       const { refreshToken } = req.cookies;
       const tokenInfo = await authService.getNewAccessToken(refreshToken);
 
-      setAuthCookie(res, "accessToken", tokenInfo.accessToken);
+      setAuthCookie(res, tokenInfo);
 
       sendResponse(res, {
             success: true,
