@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { envVars } from "../../config/env";
 import { IsActive } from "../user/user.interface";
 import { generateToken, verifyToken } from "../../utils/jwt";
+import { createUserTokens } from "../../utils/userTokens";
 
 
 const loginUser = async (email: string, password: string) => {
@@ -18,21 +19,13 @@ const loginUser = async (email: string, password: string) => {
             throw new AppError(httpStatus.NOT_FOUND, "Invalid email or password!")
       };
 
-      const payload = {
-            userId: isUserExist._id,
-            email: isUserExist.email,
-            role: isUserExist.role
-      };
-
-      const accessToken = generateToken(payload, envVars.JWT.ACCESS_SECRET_TOKEN, envVars.JWT.ACCESS_TOKEN_EXPIRES);
-      const refreshToken = generateToken(payload, envVars.JWT.REFRESH_SECRET_TOKEN, envVars.JWT.REFRESH_TOKEN_EXPIRES);
+      const userTokens = createUserTokens(isUserExist);
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: userPassword, ...user } = isUserExist.toObject();
 
       return {
-            accessToken,
-            refreshToken,
+            userTokens,
             user
       };
 };
